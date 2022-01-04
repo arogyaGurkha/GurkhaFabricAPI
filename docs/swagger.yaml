@@ -1,0 +1,231 @@
+definitions:
+  lifecycle.approvedChaincodeResponse:
+    properties:
+      endorsement_plugin:
+        type: string
+      init_required:
+        type: boolean
+      package_ID:
+        type: string
+      sequence:
+        type: integer
+      validation_plugin:
+        type: string
+      version:
+        type: string
+    type: object
+  lifecycle.committedChaincodeResponse:
+    properties:
+      approvals:
+        additionalProperties:
+          type: boolean
+        type: object
+      endorsement_plugin:
+        type: string
+      sequence:
+        type: integer
+      validation_plugin:
+        type: string
+      version:
+        type: string
+    type: object
+  lifecycle.currentAdmin:
+    properties:
+      admin:
+        type: string
+    type: object
+  lifecycle.installedChaincodeResponse:
+    properties:
+      label:
+        type: string
+      package_ID:
+        type: string
+    type: object
+  lifecycle.packageCCRequest:
+    properties:
+      label:
+        type: string
+      language:
+        type: string
+      package_name:
+        type: string
+    type: object
+  lifecycle.queryRequest:
+    properties:
+      cc_name:
+        type: string
+      channel_name:
+        type: string
+    type: object
+  main.peerVersion:
+    properties:
+      architecture:
+        type: string
+      version:
+        type: string
+    type: object
+info:
+  contact:
+    name: arogya.Gurkha
+    url: https://github.com/arogyaGurkha
+  description: API to run fabric binaries
+  title: Hyperledger Fabric Gurkhaman API
+  version: "0.1"
+paths:
+  /fabric/lifecycle/admin:
+    get:
+      consumes:
+      - application/json
+      description: Use terminal environmental variables to get the admin for peer
+        cli container. Only Org1 and Org2 are supported.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/lifecycle.currentAdmin'
+      summary: Get the current admin org.
+      tags:
+      - lifecycle
+  /fabric/lifecycle/admin/{organization}:
+    post:
+      consumes:
+      - application/json
+      description: Use terminal environmental variables to set the admin for peer
+        cli container. Only Org1 and Org2 are supported.
+      parameters:
+      - description: organization to be set as admin (Org1 and Org2 supported)
+        in: path
+        name: organization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/lifecycle.currentAdmin'
+      summary: Set an org as the admin.
+      tags:
+      - lifecycle
+  /fabric/lifecycle/approve:
+    get:
+      consumes:
+      - application/json
+      description: '`peer lifecycle chaincode queryapproved` is executed through `exec.Command()`
+        to query approved chaincode definitions.'
+      parameters:
+      - description: cc name and the channel it was approved in
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/lifecycle.queryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: '#/definitions/lifecycle.approvedChaincodeResponse'
+      summary: Query an org's approved chaincode definition from its peer.
+      tags:
+      - lifecycle
+  /fabric/lifecycle/commit:
+    get:
+      consumes:
+      - application/json
+      description: '`peer lifecycle chaincode querycommited` is executed through `exec.Command()`
+        to query committed chaincode definitions.'
+      parameters:
+      - description: cc name and the channel it was committed in
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/lifecycle.queryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: '#/definitions/lifecycle.committedChaincodeResponse'
+      summary: Query the committed chaincode definitions by channel on a peer.
+      tags:
+      - lifecycle
+  /fabric/lifecycle/install:
+    get:
+      consumes:
+      - application/json
+      description: '`peer lifecycle chaincode queryinstalled` is executed through
+        `exec.Command()` to query installed chaincodes on a peer.'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: '#/definitions/lifecycle.installedChaincodeResponse'
+      summary: Query the installed chaincodes on a peer.
+      tags:
+      - lifecycle
+  /fabric/lifecycle/install/{package_name}:
+    post:
+      consumes:
+      - application/json
+      description: '`peer lifecycle chaincode install` is executed through `exec.Command()`
+        to install chaincode on a peer.'
+      parameters:
+      - description: name of the package to install (e.g. basic.tar.gz)
+        in: path
+        name: package_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+      summary: Install a cc.
+      tags:
+      - lifecycle
+  /fabric/lifecycle/package:
+    post:
+      consumes:
+      - application/json
+      description: '`peer lifecycle chaincode install` is executed through `exec.Command()`
+        to install chaincode on a peer.'
+      parameters:
+      - description: name of the cc to package (e.g. basic.tar.gz), the language it
+          is written in, and the label for the cc once packaging is done
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/lifecycle.packageCCRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+      summary: Package a cc.
+      tags:
+      - lifecycle
+  /fabric/peer/:
+    get:
+      description: '`peer version` is executed through `exec.Command()` to return
+        the current peer version.'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: '#/definitions/main.peerVersion'
+      summary: Get the current peer binary version
+      tags:
+      - peer
+swagger: "2.0"

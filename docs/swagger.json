@@ -1,0 +1,343 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API to run fabric binaries",
+        "title": "Hyperledger Fabric Gurkhaman API",
+        "contact": {
+            "name": "arogya.Gurkha",
+            "url": "https://github.com/arogyaGurkha"
+        },
+        "version": "0.1"
+    },
+    "paths": {
+        "/fabric/lifecycle/admin": {
+            "get": {
+                "description": "Use terminal environmental variables to get the admin for peer cli container. Only Org1 and Org2 are supported.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lifecycle"
+                ],
+                "summary": "Get the current admin org.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/lifecycle.currentAdmin"
+                        }
+                    }
+                }
+            }
+        },
+        "/fabric/lifecycle/admin/{organization}": {
+            "post": {
+                "description": "Use terminal environmental variables to set the admin for peer cli container. Only Org1 and Org2 are supported.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lifecycle"
+                ],
+                "summary": "Set an org as the admin.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "organization to be set as admin (Org1 and Org2 supported)",
+                        "name": "organization",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/lifecycle.currentAdmin"
+                        }
+                    }
+                }
+            }
+        },
+        "/fabric/lifecycle/approve": {
+            "get": {
+                "description": "`peer lifecycle chaincode queryapproved` is executed through `exec.Command()` to query approved chaincode definitions.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lifecycle"
+                ],
+                "summary": "Query an org's approved chaincode definition from its peer.",
+                "parameters": [
+                    {
+                        "description": "cc name and the channel it was approved in",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/lifecycle.queryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/lifecycle.approvedChaincodeResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/fabric/lifecycle/commit": {
+            "get": {
+                "description": "`peer lifecycle chaincode querycommited` is executed through `exec.Command()` to query committed chaincode definitions.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lifecycle"
+                ],
+                "summary": "Query the committed chaincode definitions by channel on a peer.",
+                "parameters": [
+                    {
+                        "description": "cc name and the channel it was committed in",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/lifecycle.queryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/lifecycle.committedChaincodeResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/fabric/lifecycle/install": {
+            "get": {
+                "description": "`peer lifecycle chaincode queryinstalled` is executed through `exec.Command()` to query installed chaincodes on a peer.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lifecycle"
+                ],
+                "summary": "Query the installed chaincodes on a peer.",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/lifecycle.installedChaincodeResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/fabric/lifecycle/install/{package_name}": {
+            "post": {
+                "description": "`peer lifecycle chaincode install` is executed through `exec.Command()` to install chaincode on a peer.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lifecycle"
+                ],
+                "summary": "Install a cc.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "name of the package to install (e.g. basic.tar.gz)",
+                        "name": "package_name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/fabric/lifecycle/package": {
+            "post": {
+                "description": "`peer lifecycle chaincode install` is executed through `exec.Command()` to install chaincode on a peer.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lifecycle"
+                ],
+                "summary": "Package a cc.",
+                "parameters": [
+                    {
+                        "description": "name of the cc to package (e.g. basic.tar.gz), the language it is written in, and the label for the cc once packaging is done",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/lifecycle.packageCCRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/fabric/peer/": {
+            "get": {
+                "description": "`peer version` is executed through `exec.Command()` to return the current peer version.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "peer"
+                ],
+                "summary": "Get the current peer binary version",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/main.peerVersion"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "lifecycle.approvedChaincodeResponse": {
+            "type": "object",
+            "properties": {
+                "endorsement_plugin": {
+                    "type": "string"
+                },
+                "init_required": {
+                    "type": "boolean"
+                },
+                "package_ID": {
+                    "type": "string"
+                },
+                "sequence": {
+                    "type": "integer"
+                },
+                "validation_plugin": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "lifecycle.committedChaincodeResponse": {
+            "type": "object",
+            "properties": {
+                "approvals": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "boolean"
+                    }
+                },
+                "endorsement_plugin": {
+                    "type": "string"
+                },
+                "sequence": {
+                    "type": "integer"
+                },
+                "validation_plugin": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "lifecycle.currentAdmin": {
+            "type": "object",
+            "properties": {
+                "admin": {
+                    "type": "string"
+                }
+            }
+        },
+        "lifecycle.installedChaincodeResponse": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "package_ID": {
+                    "type": "string"
+                }
+            }
+        },
+        "lifecycle.packageCCRequest": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string"
+                },
+                "package_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "lifecycle.queryRequest": {
+            "type": "object",
+            "properties": {
+                "cc_name": {
+                    "type": "string"
+                },
+                "channel_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.peerVersion": {
+            "type": "object",
+            "properties": {
+                "architecture": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
