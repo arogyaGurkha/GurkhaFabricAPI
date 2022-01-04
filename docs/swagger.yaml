@@ -57,7 +57,7 @@ definitions:
       channel_name:
         type: string
     type: object
-  main.peerVersion:
+  peer.peerVersion:
     properties:
       architecture:
         type: string
@@ -224,7 +224,7 @@ paths:
         "200":
           description: successful operation
           schema:
-            $ref: '#/definitions/main.peerVersion'
+            $ref: '#/definitions/peer.peerVersion'
       summary: Get the current peer binary version
       tags:
       - peer

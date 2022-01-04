@@ -246,7 +246,7 @@ var doc = `{
                     "200": {
                         "description": "successful operation",
                         "schema": {
-                            "$ref": "#/definitions/main.peerVersion"
+                            "$ref": "#/definitions/peer.peerVersion"
                         }
                     }
                 }
@@ -344,7 +344,7 @@ var doc = `{
                 }
             }
         },
-        "main.peerVersion": {
+        "peer.peerVersion": {
             "type": "object",
             "properties": {
                 "architecture": {
