@@ -21,12 +21,15 @@ func main() {
 
 	router := gin.Default()
 
-	// Routes
+	// peer routes
 	router.GET("/fabric/peer/", peer.GetPeerVersion)
+
+	// lifecycle routes
 	router.POST("/fabric/lifecycle/admin/:organization", lc.SetAdmin)
 	router.GET("/fabric/lifecycle/admin", lc.GetAdmin)
 	router.POST("/fabric/lifecycle/package", lc.PackageCC)
 	router.POST("/fabric/lifecycle/install/:package_name", lc.InstallCC)
+	router.GET("fabric/lifecycle/install", lc.QueryInstalledCC)
 
 	// Swagger
 	docs.SwaggerInfo.BasePath = "/"
