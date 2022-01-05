@@ -216,7 +216,7 @@ var doc = `{
                 "summary": "Package a cc.",
                 "parameters": [
                     {
-                        "description": "name of the cc to package (e.g. basic.tar.gz), the language it is written in, and the label for the cc once packaging is done",
+                        "description": "name of the cc to package (e.g. asset-transfer-basic), the language it is written in, and the label and package name for the cc once packaging is done",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -322,6 +322,9 @@ var doc = `{
         "lifecycle.packageCCRequest": {
             "type": "object",
             "properties": {
+                "cc_source_name": {
+                    "type": "string"
+                },
                 "label": {
                     "type": "string"
                 },

@@ -14,29 +14,77 @@ type installCCRequest struct {
 }
 
 type packageCCRequest struct {
-	PackageName string `json:"package_name"`
-	Label       string `json:"label"`
-	Language    string `json:"language"`
+	PackageName  string `json:"package_name"`
+	Label        string `json:"label"`
+	Language     string `json:"language"`
+	CCSourceName string `json:"cc_source_name"`
 }
 
 // PackageCC
 // @Summary Package a cc.
 // @Description `peer lifecycle chaincode install` is executed through `exec.Command()` to install chaincode on a peer.
 // @Accept json
-// @Param body body packageCCRequest true "name of the cc to package (e.g. basic.tar.gz), the language it is written in, and the label for the cc once packaging is done"
+// @Param body body packageCCRequest true "name of the cc to package (e.g. asset-transfer-basic), the language it is written in, and the label and package name for the cc once packaging is done"
 // @Produce json
 // @Tags lifecycle
 // @Success 200 "successful operation"
 // @Router /fabric/lifecycle/package [post]
 func PackageCC(c *gin.Context) {
 	var requestBody packageCCRequest
+	var packageLanguage string // fabric uses different language names, go -> golang, js -> node, ts -> node
+	GOPATH := os.Getenv("GOPATH")
+	rootPath := fmt.Sprintf("%s/src/github.com/hyperledger/fabric-samples/", GOPATH)
+	packageStoragePath := fmt.Sprintf("%s/test-network/cc-packages/", rootPath)
 
 	if err := c.BindJSON(&requestBody); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid request format."})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, requestBody)
+	switch requestBody.Language {
+	case "go", "golang":
+		packageLanguage = "golang"
+	case "java":
+		packageLanguage = "java"
+	case "javascript", "typescript":
+		packageLanguage = "node"
+	}
+
+	ccSourcePath := fmt.Sprintf("%s/%s", rootPath, requestBody.CCSourceName)
+	exists, err := fileExists(ccSourcePath)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	if !exists {
+		c.IndentedJSON(http.StatusNotFound,
+			gin.H{"message": fmt.Sprintf("Chaincode %s does not exist", requestBody.CCSourceName)})
+		return
+	}
+
+	ccSourcePath = fmt.Sprintf("%s/chaincode-%s", ccSourcePath, requestBody.Language)
+	exists, err = fileExists(ccSourcePath)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	if !exists {
+		c.IndentedJSON(http.StatusNotFound,
+			gin.H{"message": fmt.Sprintf("Chaincode in language %s does not exist", requestBody.Language)})
+		return
+	}
+
+	cmd := exec.Command("peer", "lifecycle", "chaincode", "package", packageStoragePath+requestBody.PackageName,
+		"--path", ccSourcePath, "--lang", packageLanguage, "--label", requestBody.Label)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		errMessage := fmt.Sprintf(fmt.Sprint(err) + ": " + string(output))
+		c.IndentedJSON(http.StatusForbidden, gin.H{"message": errMessage})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "CC successfully packaged."})
 }
 
 // InstallCC
@@ -49,21 +97,25 @@ func PackageCC(c *gin.Context) {
 // @Success 200 "successful operation"
 // @Router /fabric/lifecycle/install/{package_name} [post]
 func InstallCC(c *gin.Context) {
+	GOPATH := os.Getenv("GOPATH")
+	rootPath := fmt.Sprintf("%s/src/github.com/hyperledger/fabric-samples/", GOPATH)
+	packageStoragePath := fmt.Sprintf("%s/test-network/cc-packages/", rootPath)
 
-	fileNameParameter := c.Param("package_name")
+	packageNameParameter := c.Param("package_name")
+	ccPackagePath := fmt.Sprintf("%s/%s", packageStoragePath, packageNameParameter)
 
-	fileExists, pathToPackage, err := fileExists(fileNameParameter)
+	fileExists, err := fileExists(ccPackagePath)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 	if !fileExists {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": fmt.Sprintf("Package %s does not exist", fileNameParameter)})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": fmt.Sprintf("Package %s does not exist", packageNameParameter)})
 		return
 	}
 
-	cmd := exec.Command("peer", "lifecycle", "chaincode", "install", pathToPackage)
+	cmd := exec.Command("peer", "lifecycle", "chaincode", "install", ccPackagePath)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		errMessage := fmt.Sprintf(fmt.Sprint(err) + ": " + string(output))
@@ -75,16 +127,13 @@ func InstallCC(c *gin.Context) {
 }
 
 // fileExists checks if the requested file exists in test-network's directory.
-// returns true and the full path of the file
-func fileExists(fileName string) (bool, string, error) {
-	gopath := os.Getenv("GOPATH")
-	path := gopath + "/src/github.com/hyperledger/fabric-samples/test-network/" + fileName
-	_, err := os.Stat(path)
+func fileExists(fileName string) (bool, error) {
+	_, err := os.Stat(fileName)
 	if err == nil {
-		return true, path, nil
+		return true, nil
 	}
 	if errors.Is(err, os.ErrNotExist) {
-		return false, "", nil
+		return false, nil
 	}
-	return false, "", err
+	return false, err
 }

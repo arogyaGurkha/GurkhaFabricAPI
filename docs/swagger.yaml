@@ -43,6 +43,8 @@ definitions:
     type: object
   lifecycle.packageCCRequest:
     properties:
+      cc_source_name:
+        type: string
       label:
         type: string
       language:
@@ -199,8 +201,9 @@ paths:
       description: '`peer lifecycle chaincode install` is executed through `exec.Command()`
         to install chaincode on a peer.'
       parameters:
-      - description: name of the cc to package (e.g. basic.tar.gz), the language it
-          is written in, and the label for the cc once packaging is done
+      - description: name of the cc to package (e.g. asset-transfer-basic), the language
+          it is written in, and the label and package name for the cc once packaging
+          is done
         in: body
         name: body
         required: true
