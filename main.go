@@ -25,12 +25,13 @@ func main() {
 	router.GET("/fabric/peer/", peer.GetPeerVersion)
 
 	// lifecycle routes
-	router.POST("/fabric/lifecycle/admin/:organization", lc.SetAdmin)
 	router.GET("/fabric/lifecycle/admin", lc.GetAdmin)
+	router.POST("/fabric/lifecycle/admin/:organization", lc.SetAdmin)
 	router.POST("/fabric/lifecycle/package", lc.PackageCC)
 	router.POST("/fabric/lifecycle/install/:package_name", lc.InstallCC)
-	router.GET("fabric/lifecycle/install", lc.QueryInstalledCC)
 	router.POST("fabric/lifecycle/approve", lc.ApproveCC)
+	router.GET("fabric/lifecycle/install", lc.QueryInstalledCC)
+	router.GET("fabric/lifecycle/approve", lc.QueryApprovedCC)
 
 	// Swagger
 	docs.SwaggerInfo.BasePath = "/"

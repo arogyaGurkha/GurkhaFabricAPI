@@ -93,7 +93,7 @@ var doc = `{
                 "tags": [
                     "lifecycle"
                 ],
-                "summary": "Query an org's approved chaincode definition from its peer.",
+                "summary": "Query an approved chaincode definition on a channel.",
                 "parameters": [
                     {
                         "description": "cc name and the channel it was approved in",

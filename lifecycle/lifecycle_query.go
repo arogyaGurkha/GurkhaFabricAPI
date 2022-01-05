@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -35,7 +36,8 @@ type queryRequest struct {
 	CCName      string `json:"cc_name"`
 }
 
-// @Summary Query an org's approved chaincode definition from its peer.
+// QueryApprovedCC
+// @Summary Query an approved chaincode definition on a channel.
 // @Description `peer lifecycle chaincode queryapproved` is executed through `exec.Command()` to query approved chaincode definitions.
 // @Accept json
 // @Param body body queryRequest true "cc name and the channel it was approved in"
@@ -43,8 +45,32 @@ type queryRequest struct {
 // @Tags lifecycle
 // @Success 200 {object} approvedChaincodeResponse "successful operation"
 // @Router /fabric/lifecycle/approve [get]
-func queryApprovedCC(c *gin.Context) {
+func QueryApprovedCC(c *gin.Context) {
+	var requestBody queryRequest
+	var responseBody approvedChaincodeResponse
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid request format."})
+		return
+	}
 
+	cmd := exec.Command("peer", "lifecycle", "chaincode", "queryapproved", "-C", requestBody.ChannelName,
+		"--name", requestBody.CCName)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		errMessage := fmt.Sprintf(fmt.Sprint(err) + ": " + string(output))
+		c.IndentedJSON(http.StatusForbidden, gin.H{"message": errMessage})
+		return
+	}
+
+	outputList := strings.Split(string(output), ":")
+	fmt.Println(outputList[2][1:strings.Index(outputList[2], ",")])
+	i, _ := strconv.Atoi(outputList[2][1:strings.Index(outputList[2], ",")])
+	responseBody.Sequence = int32(i)
+	responseBody.Version = outputList[3][1:strings.Index(outputList[3], ",")]
+	b, _ := strconv.ParseBool(outputList[4][1:strings.Index(outputList[4], ",")])
+	responseBody.InitRequired = b
+
+	c.IndentedJSON(http.StatusOK, string(output))
 }
 
 // @Summary Query the committed chaincode definitions by channel on a peer.

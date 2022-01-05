@@ -145,7 +145,7 @@ paths:
           description: successful operation
           schema:
             $ref: '#/definitions/lifecycle.approvedChaincodeResponse'
-      summary: Query an org's approved chaincode definition from its peer.
+      summary: Query an approved chaincode definition on a channel.
       tags:
       - lifecycle
     post:
