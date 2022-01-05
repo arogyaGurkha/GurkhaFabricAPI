@@ -20,6 +20,14 @@ type packageCCRequest struct {
 	CCSourceName string `json:"cc_source_name"`
 }
 
+type approveCCRequest struct {
+	ChannelName string `json:"channel_name"`
+	CCName      string `json:"cc_name"`
+	CCVersion   string `json:"cc_version"`
+	CCSequence  int32  `json:"cc_sequence"`
+	PackageID   string `json:"package_ID"`
+}
+
 // PackageCC
 // @Summary Package a cc.
 // @Description `peer lifecycle chaincode install` is executed through `exec.Command()` to install chaincode on a peer.
@@ -124,6 +132,46 @@ func InstallCC(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "Package successfully installed."})
+}
+
+// ApproveCC
+// @Summary Approve the cc definition for the current org.
+// @Description `peer lifecycle chaincode approveformyorg` is executed through `exec.Command()` to approve a chaincode definition.
+// @Accept json
+// @Param body body approveCCRequest true "channel name (mychannel), cc name (basic), cc version (1.0), cc sequence (1), package ID (run [GET] /fabric/lifecycle/install)"
+// @Produce json
+// @Tags lifecycle
+// @Success 200 "successful operation"
+// @Router /fabric/lifecycle/approve [post]
+func ApproveCC(c *gin.Context) {
+	var requestBody approveCCRequest
+	GOPATH := os.Getenv("GOPATH")
+	networkPath := fmt.Sprintf("%s/src/github.com/hyperledger/fabric-samples/test-network", GOPATH)
+	ordererIP := "localhost:7050"
+	ordererName := "orderer.example.com"
+	ordererCertPath := fmt.Sprintf("%s/organizations/ordererOrganizations/example.com/orderers/"+
+		"orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem", networkPath)
+
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid request format."})
+		return
+	}
+
+	cmd := exec.Command("peer", "lifecycle", "chaincode", "approveformyorg", "-o", ordererIP,
+		"--ordererTLSHostnameOverride", ordererName, "--channelID", requestBody.ChannelName, "--name",
+		requestBody.CCName, "--version", requestBody.CCVersion, "--package-id", requestBody.PackageID,
+		"--sequence", fmt.Sprint(requestBody.CCSequence), "--tls", "--cafile", ordererCertPath)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		errMessage := fmt.Sprintf(fmt.Sprint(err) + ": " + string(output))
+		c.IndentedJSON(http.StatusForbidden, gin.H{"message": errMessage})
+		return
+	}
+	envAdmin := os.Getenv("CORE_PEER_ADMIN")
+	successResponseMessage := fmt.Sprintf("CC definition of %s successfully approved for organization %s",
+		requestBody.CCName, envAdmin)
+	c.IndentedJSON(http.StatusOK, gin.H{"message": successResponseMessage})
 }
 
 // fileExists checks if the requested file exists in test-network's directory.

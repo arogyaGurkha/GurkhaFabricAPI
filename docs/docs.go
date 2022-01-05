@@ -113,6 +113,35 @@ var doc = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "description": "` + "`" + `peer lifecycle chaincode approveformyorg` + "`" + ` is executed through ` + "`" + `exec.Command()` + "`" + ` to approve a chaincode definition.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lifecycle"
+                ],
+                "summary": "Approve the cc definition for the current org.",
+                "parameters": [
+                    {
+                        "description": "channel name (mychannel), cc name (basic), cc version (1.0), cc sequence (1), package ID (run [GET] /fabric/lifecycle/install)",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/lifecycle.approveCCRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
             }
         },
         "/fabric/lifecycle/commit": {
@@ -254,6 +283,26 @@ var doc = `{
         }
     },
     "definitions": {
+        "lifecycle.approveCCRequest": {
+            "type": "object",
+            "properties": {
+                "cc_name": {
+                    "type": "string"
+                },
+                "cc_sequence": {
+                    "type": "integer"
+                },
+                "cc_version": {
+                    "type": "string"
+                },
+                "channel_name": {
+                    "type": "string"
+                },
+                "package_ID": {
+                    "type": "string"
+                }
+            }
+        },
         "lifecycle.approvedChaincodeResponse": {
             "type": "object",
             "properties": {

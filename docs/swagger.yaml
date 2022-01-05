@@ -1,4 +1,17 @@
 definitions:
+  lifecycle.approveCCRequest:
+    properties:
+      cc_name:
+        type: string
+      cc_sequence:
+        type: integer
+      cc_version:
+        type: string
+      channel_name:
+        type: string
+      package_ID:
+        type: string
+    type: object
   lifecycle.approvedChaincodeResponse:
     properties:
       endorsement_plugin:
@@ -133,6 +146,27 @@ paths:
           schema:
             $ref: '#/definitions/lifecycle.approvedChaincodeResponse'
       summary: Query an org's approved chaincode definition from its peer.
+      tags:
+      - lifecycle
+    post:
+      consumes:
+      - application/json
+      description: '`peer lifecycle chaincode approveformyorg` is executed through
+        `exec.Command()` to approve a chaincode definition.'
+      parameters:
+      - description: channel name (mychannel), cc name (basic), cc version (1.0),
+          cc sequence (1), package ID (run [GET] /fabric/lifecycle/install)
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/lifecycle.approveCCRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+      summary: Approve the cc definition for the current org.
       tags:
       - lifecycle
   /fabric/lifecycle/commit:
