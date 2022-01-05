@@ -1,9 +1,11 @@
 package lifecycle
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type currentAdmin struct {
@@ -20,40 +22,35 @@ type currentAdmin struct {
 // @Success 200 {object} currentAdmin
 // @Router /fabric/lifecycle/admin/{organization} [post]
 func SetAdmin(c *gin.Context) {
-
-	os.Setenv("CORE_PEER_TLS_ENABLED", "true")
-	gopath := os.Getenv("GOPATH")
-	networkPath := gopath + "/src/github.com/hyperledger/fabric-samples/test-network/"
-
 	var admin currentAdmin
+	GOPATH := os.Getenv("GOPATH")
+	networkPath := fmt.Sprintf("%s/src/github.com/hyperledger/fabric-samples/test-network/", GOPATH)
+	os.Setenv("CORE_PEER_TLS_ENABLED", "true")
 
 	organization := c.Param("organization")
 
+	if !(organization == "Org1" || organization == "Org2") {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Only Org1 or Org2 supported."})
+		return
+	}
+
+	os.Setenv("CORE_PEER_ADMIN", organization)
+	os.Setenv("CORE_PEER_LOCALMSPID", fmt.Sprintf("%sMSP", organization))
+	os.Setenv("CORE_PEER_TLS_ROOTCERT_FILE",
+		fmt.Sprintf("%s/organizations/peerOrganizations/%s.example.com/peers/peer0.%s.example.com/tls/ca.crt",
+			networkPath, strings.ToLower(organization), strings.ToLower(organization)))
+	os.Setenv("CORE_PEER_MSPCONFIGPATH",
+		fmt.Sprintf("%s/organizations/peerOrganizations/%s.example.com/users/Admin@%s.example.com/msp",
+			networkPath, strings.ToLower(organization), strings.ToLower(organization)))
+
 	if organization == "Org1" {
-		os.Setenv("CORE_PEER_ADMIN", organization)
-		os.Setenv("CORE_PEER_LOCALMSPID", "Org1MSP")
-		os.Setenv("CORE_PEER_TLS_ROOTCERT_FILE", networkPath+"/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt")
-		os.Setenv("CORE_PEER_MSPCONFIGPATH", networkPath+"/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp")
 		os.Setenv("CORE_PEER_ADDRESS", "localhost:7051")
-
-		admin.Admin = organization
-		c.IndentedJSON(http.StatusOK, admin)
-		return
-	}
-
-	if organization == "Org2" {
-		os.Setenv("CORE_PEER_ADMIN", organization)
-		os.Setenv("CORE_PEER_LOCALMSPID", "Org2MSP")
-		os.Setenv("CORE_PEER_TLS_ROOTCERT_FILE", networkPath+"/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt")
-		os.Setenv("CORE_PEER_MSPCONFIGPATH", networkPath+"/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp")
+	} else if organization == "Org2" {
 		os.Setenv("CORE_PEER_ADDRESS", "localhost:9051")
-
-		admin.Admin = organization
-		c.IndentedJSON(http.StatusOK, admin)
-		return
 	}
 
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Setting admin failure."})
+	admin.Admin = organization
+	c.IndentedJSON(http.StatusOK, admin)
 }
 
 // GetAdmin
@@ -66,6 +63,7 @@ func SetAdmin(c *gin.Context) {
 // @Router /fabric/lifecycle/admin [get]
 func GetAdmin(c *gin.Context) {
 	var admin currentAdmin
+	os.Setenv("CORE_PEER_TLS_ENABLED", "true")
 
 	envAdmin := os.Getenv("CORE_PEER_ADMIN")
 
@@ -75,6 +73,5 @@ func GetAdmin(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Error getting current admin."})
-
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Error getting current admin. Please check if an admin has been set."})
 }
