@@ -34,6 +34,7 @@ func main() {
 	router.GET("fabric/lifecycle/install", lc.QueryInstalledCC)
 	router.GET("fabric/lifecycle/approve", lc.QueryApprovedCC)
 	router.GET("fabric/lifecycle/commit/organizations", lc.QueryCommitReadiness)
+	router.GET("fabric/lifecycle/commit", lc.QueryCommittedCC)
 
 	// Swagger
 	docs.SwaggerInfo.BasePath = "/"

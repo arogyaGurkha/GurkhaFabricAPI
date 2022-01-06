@@ -85,6 +85,7 @@ func QueryApprovedCC(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, string(output))
 }
 
+// QueryCommittedCC
 // @Summary Query the committed chaincode definitions by channel on a peer.
 // @Description `peer lifecycle chaincode querycommited` is executed through `exec.Command()` to query committed chaincode definitions.
 // @Accept json
@@ -93,8 +94,28 @@ func QueryApprovedCC(c *gin.Context) {
 // @Tags lifecycle
 // @Success 200 {object} committedChaincodeResponse "successful operation"
 // @Router /fabric/lifecycle/commit [get]
-func queryCommittedCC(c *gin.Context) {
+func QueryCommittedCC(c *gin.Context) {
+	var requestBody queryRequest
+	GOPATH := os.Getenv("GOPATH")
+	networkPath := fmt.Sprintf("%s/src/github.com/hyperledger/fabric-samples/test-network", GOPATH)
+	ordererCertPath := fmt.Sprintf("%s/organizations/ordererOrganizations/example.com/orderers/"+
+		"orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem", networkPath)
 
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid request format."})
+		return
+	}
+
+	cmd := exec.Command("peer", "lifecycle", "chaincode", "querycommitted",
+		"--channelID", requestBody.ChannelName, "--name", requestBody.CCName, "--cafile", ordererCertPath)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		errMessage := fmt.Sprintf(fmt.Sprint(err) + ": " + string(output))
+		c.IndentedJSON(http.StatusForbidden, gin.H{"message": errMessage})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, string(output))
 }
 
 // QueryInstalledCC
