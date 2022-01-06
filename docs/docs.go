@@ -125,7 +125,7 @@ var doc = `{
                 "tags": [
                     "lifecycle"
                 ],
-                "summary": "Commit the chaincode definition on the channel.",
+                "summary": "Approve the cc definition for the current org.",
                 "parameters": [
                     {
                         "description": "channel name (mychannel), cc name (basic), cc version (1.0), cc sequence (1), package ID (run [GET] /fabric/lifecycle/install)",
@@ -174,6 +174,35 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/lifecycle.committedChaincodeResponse"
                         }
+                    }
+                }
+            },
+            "post": {
+                "description": "` + "`" + `peer lifecycle chaincode commit` + "`" + ` is executed through ` + "`" + `exec.Command()` + "`" + ` to commit chaincode definition on a channel.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lifecycle"
+                ],
+                "summary": "Commit the chaincode definition on the channel.",
+                "parameters": [
+                    {
+                        "description": "channel name (mychannel), cc name (basic), cc version (1.0), cc sequence (1)",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/lifecycle.commitCCRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
                     }
                 }
             }
@@ -385,6 +414,23 @@ var doc = `{
                     "additionalProperties": {
                         "type": "boolean"
                     }
+                }
+            }
+        },
+        "lifecycle.commitCCRequest": {
+            "type": "object",
+            "properties": {
+                "cc_name": {
+                    "type": "string"
+                },
+                "cc_sequence": {
+                    "type": "integer"
+                },
+                "cc_version": {
+                    "type": "string"
+                },
+                "channel_name": {
+                    "type": "string"
                 }
             }
         },

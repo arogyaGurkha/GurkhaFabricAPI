@@ -28,6 +28,24 @@ type approveCCRequest struct {
 	PackageID   string `json:"package_ID"`
 }
 
+type commitCCRequest struct {
+	ChannelName string `json:"channel_name"`
+	CCName      string `json:"cc_name"`
+	CCVersion   string `json:"cc_version"`
+	CCSequence  int32  `json:"cc_sequence"`
+}
+
+type ordererInfo struct {
+	IP       string `json:"IP"`
+	CertPath string `json:"cert_path"`
+	Name     string `json:"name"`
+}
+
+type peerInfo struct {
+	IP       string `json:"IP"`
+	CertPath string `json:"cert_path"`
+}
+
 // PackageCC
 // @Summary Package a cc.
 // @Description `peer lifecycle chaincode install` is executed through `exec.Command()` to install chaincode on a peer.
@@ -172,6 +190,54 @@ func ApproveCC(c *gin.Context) {
 	successResponseMessage := fmt.Sprintf("CC definition of %s successfully approved for organization %s",
 		requestBody.CCName, envAdmin)
 	c.IndentedJSON(http.StatusOK, gin.H{"message": successResponseMessage})
+}
+
+// CommitCC
+// @Summary Commit the chaincode definition on the channel.
+// @Description `peer lifecycle chaincode commit` is executed through `exec.Command()` to commit chaincode definition on a channel.
+// @Accept json
+// @Param body body commitCCRequest true "channel name (mychannel), cc name (basic), cc version (1.0), cc sequence (1)"
+// @Produce json
+// @Tags lifecycle
+// @Success 200 "successful operation"
+// @Router /fabric/lifecycle/commit [post]
+func CommitCC(c *gin.Context) {
+	var requestBody ccApprovalRequest
+	var orderer ordererInfo
+	var peer1, peer2 peerInfo
+	GOPATH := os.Getenv("GOPATH")
+	networkPath := fmt.Sprintf("%s/src/github.com/hyperledger/fabric-samples/test-network", GOPATH)
+
+	orderer.IP = "localhost:7050"
+	orderer.Name = "orderer.example.com"
+	orderer.CertPath = fmt.Sprintf("%s/organizations/ordererOrganizations/example.com/orderers/"+
+		"orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem", networkPath)
+	peer1.IP = "localhost:7051"
+	peer1.CertPath = fmt.Sprintf("%s/organizations/peerOrganizations/org1.example.com/peers/"+
+		"peer0.org1.example.com/tls/ca.crt", networkPath)
+	peer2.IP = "localhost:9051"
+	peer2.CertPath = fmt.Sprintf("%s/organizations/peerOrganizations/org2.example.com/peers/"+
+		"peer0.org2.example.com/tls/ca.crt", networkPath)
+
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid request format."})
+		return
+	}
+
+	cmd := exec.Command("peer", "lifecycle", "chaincode", "commit", "-o", orderer.IP,
+		"--ordererTLSHostnameOverride", orderer.Name, "--channelID", requestBody.ChannelName, "--name", requestBody.CCName,
+		"--version", requestBody.CCVersion, "--sequence", fmt.Sprint(requestBody.CCSequence), "--tls",
+		"--cafile", orderer.CertPath, "--peerAddresses", peer1.IP, "--tlsRootCertFiles", peer1.CertPath,
+		"--peerAddresses", peer2.IP, "--tlsRootCertFiles", peer2.CertPath)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		errMessage := fmt.Sprintf(fmt.Sprint(err) + ": " + string(output))
+		c.IndentedJSON(http.StatusForbidden, gin.H{"message": errMessage})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, string(output))
 }
 
 // fileExists checks if the requested file exists in test-network's directory.

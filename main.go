@@ -30,6 +30,7 @@ func main() {
 	router.POST("/fabric/lifecycle/package", lc.PackageCC)
 	router.POST("/fabric/lifecycle/install/:package_name", lc.InstallCC)
 	router.POST("fabric/lifecycle/approve", lc.ApproveCC)
+	router.POST("fabric/lifecycle/commit", lc.CommitCC)
 	router.GET("fabric/lifecycle/install", lc.QueryInstalledCC)
 	router.GET("fabric/lifecycle/approve", lc.QueryApprovedCC)
 	router.GET("fabric/lifecycle/commit/organizations", lc.QueryCommitReadiness)
