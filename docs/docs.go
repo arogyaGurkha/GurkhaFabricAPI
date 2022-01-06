@@ -343,6 +343,37 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/fabric/repository/clone": {
+            "post": {
+                "description": "Clone a repository.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "repository"
+                ],
+                "summary": "Clone a repository.",
+                "parameters": [
+                    {
+                        "description": "url (https://github.com/arogyaGurkha/GurkhaContracts.git), directory (~/)",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/repository.cloneRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -511,6 +542,17 @@ var doc = `{
                     "type": "string"
                 },
                 "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "repository.cloneRequest": {
+            "type": "object",
+            "properties": {
+                "directory": {
+                    "type": "string"
+                },
+                "url": {
                     "type": "string"
                 }
             }

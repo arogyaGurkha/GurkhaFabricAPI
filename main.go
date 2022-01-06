@@ -4,6 +4,7 @@ import (
 	"github.com/arogyaGurkha/GurkhaFabricAPI/docs"
 	lc "github.com/arogyaGurkha/GurkhaFabricAPI/lifecycle"
 	"github.com/arogyaGurkha/GurkhaFabricAPI/peer"
+	repo "github.com/arogyaGurkha/GurkhaFabricAPI/repository"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -35,6 +36,9 @@ func main() {
 	router.GET("fabric/lifecycle/approve", lc.QueryApprovedCC)
 	router.GET("fabric/lifecycle/commit/organizations", lc.QueryCommitReadiness)
 	router.GET("fabric/lifecycle/commit", lc.QueryCommittedCC)
+
+	// repository routes
+	router.POST("fabric/repository/clone", repo.CloneCC)
 
 	// Swagger
 	docs.SwaggerInfo.BasePath = "/"

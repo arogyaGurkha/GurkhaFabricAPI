@@ -108,6 +108,13 @@ definitions:
       version:
         type: string
     type: object
+  repository.cloneRequest:
+    properties:
+      directory:
+        type: string
+      url:
+        type: string
+    type: object
 info:
   contact:
     name: arogya.Gurkha
@@ -340,4 +347,25 @@ paths:
       summary: Get the current peer binary version
       tags:
       - peer
+  /fabric/repository/clone:
+    post:
+      consumes:
+      - application/json
+      description: Clone a repository.
+      parameters:
+      - description: url (https://github.com/arogyaGurkha/GurkhaContracts.git), directory
+          (~/)
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/repository.cloneRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+      summary: Clone a repository.
+      tags:
+      - repository
 swagger: "2.0"
