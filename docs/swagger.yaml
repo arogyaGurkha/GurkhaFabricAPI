@@ -27,6 +27,24 @@ definitions:
       version:
         type: string
     type: object
+  lifecycle.ccApprovalRequest:
+    properties:
+      cc_name:
+        type: string
+      cc_sequence:
+        type: integer
+      cc_version:
+        type: string
+      channel_name:
+        type: string
+    type: object
+  lifecycle.ccApprovals:
+    properties:
+      approvals:
+        additionalProperties:
+          type: boolean
+        type: object
+    type: object
   lifecycle.committedChaincodeResponse:
     properties:
       approvals:
@@ -166,7 +184,7 @@ paths:
       responses:
         "200":
           description: successful operation
-      summary: Approve the cc definition for the current org.
+      summary: Commit the chaincode definition on the channel.
       tags:
       - lifecycle
   /fabric/lifecycle/commit:
@@ -190,6 +208,31 @@ paths:
           schema:
             $ref: '#/definitions/lifecycle.committedChaincodeResponse'
       summary: Query the committed chaincode definitions by channel on a peer.
+      tags:
+      - lifecycle
+  /fabric/lifecycle/commit/organizations:
+    get:
+      consumes:
+      - application/json
+      description: '`peer lifecycle chaincode checkcommitreadiness` is executed through
+        `exec.Command()` to check commit readiness.'
+      parameters:
+      - description: channel name (mychannel), cc name (basic), cc version (1.0),
+          cc sequence (1)
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/lifecycle.ccApprovalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: '#/definitions/lifecycle.ccApprovals'
+      summary: Check whether a chaincode definition is ready to be committed on a
+        channel. Shows which organizations have approved the cc definition.
       tags:
       - lifecycle
   /fabric/lifecycle/install:

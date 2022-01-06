@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -34,6 +35,17 @@ type committedChaincodeResponse struct {
 type queryRequest struct {
 	ChannelName string `json:"channel_name"`
 	CCName      string `json:"cc_name"`
+}
+
+type ccApprovalRequest struct {
+	ChannelName string `json:"channel_name"`
+	CCName      string `json:"cc_name"`
+	CCVersion   string `json:"cc_version"`
+	CCSequence  int32  `json:"cc_sequence"`
+}
+
+type ccApprovals struct {
+	Approvals map[string]bool `json:"approvals"`
 }
 
 // QueryApprovedCC
@@ -120,4 +132,38 @@ func QueryInstalledCC(c *gin.Context) {
 	response.Label = label
 
 	c.IndentedJSON(http.StatusOK, response)
+}
+
+// QueryCommitReadiness
+// @Summary Check whether a chaincode definition is ready to be committed on a channel. Shows which organizations have approved the cc definition.
+// @Description `peer lifecycle chaincode checkcommitreadiness` is executed through `exec.Command()` to check commit readiness.
+// @Accept json
+// @Param body body ccApprovalRequest true "channel name (mychannel), cc name (basic), cc version (1.0), cc sequence (1)"
+// @Produce json
+// @Tags lifecycle
+// @Success 200 {object} ccApprovals "successful operation"
+// @Router /fabric/lifecycle/commit/organizations [get]
+func QueryCommitReadiness(c *gin.Context) {
+	var requestBody ccApprovalRequest
+	GOPATH := os.Getenv("GOPATH")
+	networkPath := fmt.Sprintf("%s/src/github.com/hyperledger/fabric-samples/test-network", GOPATH)
+	ordererCertPath := fmt.Sprintf("%s/organizations/ordererOrganizations/example.com/orderers/"+
+		"orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem", networkPath)
+
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid request format."})
+		return
+	}
+
+	cmd := exec.Command("peer", "lifecycle", "chaincode", "checkcommitreadiness", "--channelID",
+		requestBody.ChannelName, "--name", requestBody.CCName, "--version", requestBody.CCVersion,
+		"--sequence", fmt.Sprint(requestBody.CCSequence), "--tls", "--cafile", ordererCertPath, "--output", "json")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		errMessage := fmt.Sprintf(fmt.Sprint(err) + ": " + string(output))
+		c.IndentedJSON(http.StatusForbidden, gin.H{"message": errMessage})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, string(output))
 }

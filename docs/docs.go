@@ -125,7 +125,7 @@ var doc = `{
                 "tags": [
                     "lifecycle"
                 ],
-                "summary": "Approve the cc definition for the current org.",
+                "summary": "Commit the chaincode definition on the channel.",
                 "parameters": [
                     {
                         "description": "channel name (mychannel), cc name (basic), cc version (1.0), cc sequence (1), package ID (run [GET] /fabric/lifecycle/install)",
@@ -173,6 +173,40 @@ var doc = `{
                         "description": "successful operation",
                         "schema": {
                             "$ref": "#/definitions/lifecycle.committedChaincodeResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/fabric/lifecycle/commit/organizations": {
+            "get": {
+                "description": "` + "`" + `peer lifecycle chaincode checkcommitreadiness` + "`" + ` is executed through ` + "`" + `exec.Command()` + "`" + ` to check commit readiness.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lifecycle"
+                ],
+                "summary": "Check whether a chaincode definition is ready to be committed on a channel. Shows which organizations have approved the cc definition.",
+                "parameters": [
+                    {
+                        "description": "channel name (mychannel), cc name (basic), cc version (1.0), cc sequence (1)",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/lifecycle.ccApprovalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/lifecycle.ccApprovals"
                         }
                     }
                 }
@@ -323,6 +357,34 @@ var doc = `{
                 },
                 "version": {
                     "type": "string"
+                }
+            }
+        },
+        "lifecycle.ccApprovalRequest": {
+            "type": "object",
+            "properties": {
+                "cc_name": {
+                    "type": "string"
+                },
+                "cc_sequence": {
+                    "type": "integer"
+                },
+                "cc_version": {
+                    "type": "string"
+                },
+                "channel_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "lifecycle.ccApprovals": {
+            "type": "object",
+            "properties": {
+                "approvals": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "boolean"
+                    }
                 }
             }
         },
