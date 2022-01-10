@@ -1,4 +1,13 @@
 definitions:
+  chaincode.invokeCCRequest:
+    properties:
+      cc_name:
+        type: string
+      channel_name:
+        type: string
+      function:
+        type: string
+    type: object
   lifecycle.approveCCRequest:
     properties:
       cc_name:
@@ -123,6 +132,49 @@ info:
   title: Hyperledger Fabric Gurkhaman API
   version: "0.1"
 paths:
+  /fabric/chaincode/invoke:
+    post:
+      consumes:
+      - application/json
+      description: '`peer chaincode invoke` is executed through `exec.Command()` to
+        invoke the specified chaincode.'
+      parameters:
+      - description: channel name (mychannel), cc name (basic), function ('{
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/chaincode.invokeCCRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+      summary: Invoke the specified chaincode.
+      tags:
+      - chaincode
+  /fabric/chaincode/query:
+    get:
+      consumes:
+      - application/json
+      description: '`peer chaincode invoke` is executed through `exec.Command()` to
+        get endorsed result of chaincode function call and print it. It won''t generate
+        transaction.'
+      parameters:
+      - description: channel name (mychannel), cc name (basic)
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/chaincode.invokeCCRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+      summary: Query using the specified chaincode.
+      tags:
+      - chaincode
   /fabric/lifecycle/admin:
     get:
       consumes:

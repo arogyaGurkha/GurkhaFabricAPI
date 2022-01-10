@@ -60,6 +60,7 @@ func PackageCC(c *gin.Context) {
 	var packageLanguage string // fabric uses different language names, go -> golang, js -> node, ts -> node
 	GOPATH := os.Getenv("GOPATH")
 	rootPath := fmt.Sprintf("%s/src/github.com/hyperledger/fabric-samples/", GOPATH)
+	repoPath := fmt.Sprintf("%s/GurkhaContracts/", rootPath)
 	packageStoragePath := fmt.Sprintf("%s/test-network/cc-packages/", rootPath)
 
 	if err := c.BindJSON(&requestBody); err != nil {
@@ -76,7 +77,7 @@ func PackageCC(c *gin.Context) {
 		packageLanguage = "node"
 	}
 
-	ccSourcePath := fmt.Sprintf("%s/%s", rootPath, requestBody.CCSourceName)
+	ccSourcePath := fmt.Sprintf("%s/%s", repoPath, requestBody.CCSourceName)
 	exists, err := fileExists(ccSourcePath)
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})

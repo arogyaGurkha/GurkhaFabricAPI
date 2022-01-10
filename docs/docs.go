@@ -26,6 +26,68 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/fabric/chaincode/invoke": {
+            "post": {
+                "description": "` + "`" + `peer chaincode invoke` + "`" + ` is executed through ` + "`" + `exec.Command()` + "`" + ` to invoke the specified chaincode.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chaincode"
+                ],
+                "summary": "Invoke the specified chaincode.",
+                "parameters": [
+                    {
+                        "description": "channel name (mychannel), cc name (basic), function ('{",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/chaincode.invokeCCRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/fabric/chaincode/query": {
+            "get": {
+                "description": "` + "`" + `peer chaincode invoke` + "`" + ` is executed through ` + "`" + `exec.Command()` + "`" + ` to get endorsed result of chaincode function call and print it. It won't generate transaction.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chaincode"
+                ],
+                "summary": "Query using the specified chaincode.",
+                "parameters": [
+                    {
+                        "description": "channel name (mychannel), cc name (basic)",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/chaincode.invokeCCRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
         "/fabric/lifecycle/admin": {
             "get": {
                 "description": "Use terminal environmental variables to get the admin for peer cli container. Only Org1 and Org2 are supported.",
@@ -397,6 +459,20 @@ var doc = `{
         }
     },
     "definitions": {
+        "chaincode.invokeCCRequest": {
+            "type": "object",
+            "properties": {
+                "cc_name": {
+                    "type": "string"
+                },
+                "channel_name": {
+                    "type": "string"
+                },
+                "function": {
+                    "type": "string"
+                }
+            }
+        },
         "lifecycle.approveCCRequest": {
             "type": "object",
             "properties": {

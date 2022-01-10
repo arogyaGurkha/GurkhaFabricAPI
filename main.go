@@ -1,6 +1,7 @@
 package main
 
 import (
+	cc "github.com/arogyaGurkha/GurkhaFabricAPI/chaincode"
 	"github.com/arogyaGurkha/GurkhaFabricAPI/docs"
 	lc "github.com/arogyaGurkha/GurkhaFabricAPI/lifecycle"
 	"github.com/arogyaGurkha/GurkhaFabricAPI/peer"
@@ -40,6 +41,10 @@ func main() {
 	// repository routes
 	router.POST("fabric/repository/clone", repo.CloneCC)
 	router.POST("fabric/repository/pull", repo.PullOrigin)
+
+	// chaincode routes
+	router.POST("fabric/chaincode/invoke", cc.InvokeCC)
+	router.GET("fabric/chaincode/query", cc.QueryCC)
 
 	// Swagger
 	docs.SwaggerInfo.BasePath = "/"
