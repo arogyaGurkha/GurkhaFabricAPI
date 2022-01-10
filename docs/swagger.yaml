@@ -354,7 +354,7 @@ paths:
       description: Clone a repository.
       parameters:
       - description: url (https://github.com/arogyaGurkha/GurkhaContracts.git), directory
-          (~/)
+          (GurkhaContracts or nil)
         in: body
         name: body
         required: true
@@ -366,6 +366,19 @@ paths:
         "200":
           description: successful operation
       summary: Clone a repository.
+      tags:
+      - repository
+  /fabric/repository/pull:
+    post:
+      consumes:
+      - application/json
+      description: Pull changes from a remote repository.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+      summary: Pull changes from a remote repository.
       tags:
       - repository
 swagger: "2.0"

@@ -359,7 +359,7 @@ var doc = `{
                 "summary": "Clone a repository.",
                 "parameters": [
                     {
-                        "description": "url (https://github.com/arogyaGurkha/GurkhaContracts.git), directory (~/)",
+                        "description": "url (https://github.com/arogyaGurkha/GurkhaContracts.git), directory (GurkhaContracts or nil)",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -368,6 +368,26 @@ var doc = `{
                         }
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/fabric/repository/pull": {
+            "post": {
+                "description": "Pull changes from a remote repository.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "repository"
+                ],
+                "summary": "Pull changes from a remote repository.",
                 "responses": {
                     "200": {
                         "description": "successful operation"

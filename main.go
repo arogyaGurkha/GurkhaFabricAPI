@@ -39,6 +39,7 @@ func main() {
 
 	// repository routes
 	router.POST("fabric/repository/clone", repo.CloneCC)
+	router.POST("fabric/repository/pull", repo.PullOrigin)
 
 	// Swagger
 	docs.SwaggerInfo.BasePath = "/"
