@@ -4,6 +4,7 @@ import (
 	cc "github.com/arogyaGurkha/GurkhaFabricAPI/chaincode"
 	"github.com/arogyaGurkha/GurkhaFabricAPI/docs"
 	lc "github.com/arogyaGurkha/GurkhaFabricAPI/lifecycle"
+	"github.com/arogyaGurkha/GurkhaFabricAPI/network"
 	"github.com/arogyaGurkha/GurkhaFabricAPI/peer"
 	repo "github.com/arogyaGurkha/GurkhaFabricAPI/repository"
 	"github.com/gin-gonic/gin"
@@ -45,6 +46,10 @@ func main() {
 	// chaincode routes
 	router.POST("fabric/chaincode/invoke", cc.InvokeCC)
 	router.GET("fabric/chaincode/query", cc.QueryCC)
+
+	// network routes
+	router.POST("fabric/network/up", network.StartFabricWChannel)
+	router.POST("fabric/network/down", network.StopFabric)
 
 	// Swagger
 	docs.SwaggerInfo.BasePath = "/"

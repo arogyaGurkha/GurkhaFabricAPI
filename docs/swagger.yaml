@@ -385,6 +385,30 @@ paths:
       summary: Package a cc.
       tags:
       - lifecycle
+  /fabric/network/down:
+    post:
+      description: '`network.sh down` is executed through `exec.Command()` to shut
+        down the network.'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+      summary: Bring down the fabric network.
+      tags:
+      - network
+  /fabric/network/up:
+    post:
+      description: '`network.sh up createChannel` is executed through `exec.Command()`
+        to start the network and create channel `mychannel`.'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+      summary: Bring up fabric network with one channel.
+      tags:
+      - network
   /fabric/peer/:
     get:
       description: '`peer version` is executed through `exec.Command()` to return
