@@ -19,7 +19,7 @@ func StartFabricWChannel(c *gin.Context) {
 	GOPATH := os.Getenv("GOPATH")
 	networkPath := fmt.Sprintf("%s/src/github.com/hyperledger/fabric-samples/test-network", GOPATH)
 
-	cmd := exec.Command("sh", "network.sh", "up", "createChannel")
+	cmd := exec.Command("bash", "network.sh", "up", "createChannel")
 	cmd.Dir = networkPath
 
 	output, err := cmd.CombinedOutput()
@@ -43,7 +43,7 @@ func StopFabric(c *gin.Context) {
 	GOPATH := os.Getenv("GOPATH")
 	networkPath := fmt.Sprintf("%s/src/github.com/hyperledger/fabric-samples/test-network", GOPATH)
 
-	cmd := exec.Command("sh", "network.sh", "down")
+	cmd := exec.Command("bash", "network.sh", "down")
 	cmd.Dir = networkPath
 
 	output, err := cmd.CombinedOutput()
