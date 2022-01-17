@@ -1,19 +1,20 @@
 #!/bin/bash
 
 DELAY=${10:-"3"}
+IPADDR='127.0.0.1'
 
 admin1(){
-  ADMIN1=$(curl --location --request POST '127.0.0.1:8080/fabric/lifecycle/admin/Org1')
+  ADMIN1=$(curl --location --request POST "$IPADDR:8080/fabric/lifecycle/admin/Org1")
   echo $ADMIN1
 }
 
 admin2(){
-  ADMIN2=$(curl --location --request POST '127.0.0.1:8080/fabric/lifecycle/admin/Org2')
+  ADMIN2=$(curl --location --request POST "$IPADDR:8080/fabric/lifecycle/admin/Org2")
   echo $ADMIN2
 }
 
 commitCC(){
-  COMMITCC=$(curl --location --request POST '127.0.0.1:8080/fabric/lifecycle/commit' \
+  COMMITCC=$(curl --location --request POST "$IPADDR:8080/fabric/lifecycle/commit" \
   --header 'Content-Type: application/json' \
   --data-raw '{
       "cc_name": "basic",
@@ -25,17 +26,17 @@ commitCC(){
 }
 
 queryInstall(){
-  INSTALLID=$(curl --location --request GET '127.0.0.1:8080/fabric/lifecycle/install')
+  INSTALLID=$(curl --location --request GET "$IPADDR:8080/fabric/lifecycle/install")
   echo $INSTALLID
 }
 
 installCC(){
-  INSTALLCC=$(curl --location --request POST '127.0.0.1:8080/fabric/lifecycle/install/basic.tar.gz')
+  INSTALLCC=$(curl --location --request POST "$IPADDR:8080/fabric/lifecycle/install/basic.tar.gz")
   echo $INSTALLCC
 }
 
 packageCC(){
-  PACKAGE=$(curl --location --request POST '127.0.0.1:8080/fabric/lifecycle/package' \
+  PACKAGE=$(curl --location --request POST "$IPADDR:8080/fabric/lifecycle/package" \
   --header 'Content-Type: application/json' \
   --data-raw '{
       "cc_source_name": "asset-transfer-basic",
@@ -47,7 +48,7 @@ packageCC(){
 }
 
 approveOrg(){
-    APPROVEORG=$(curl --location --request POST '127.0.0.1:8080/fabric/lifecycle/approve' \
+    APPROVEORG=$(curl --location --request POST "$IPADDR:8080/fabric/lifecycle/approve" \
     --header 'Content-Type: application/json' \
     --data-raw '{
         "cc_name": "basic",
@@ -61,7 +62,7 @@ approveOrg(){
 
 queryCommitReady(){
      sleep $DELAY
-    QUERYCOMMITREADY=$(curl --location --request GET '127.0.0.1:8080/fabric/lifecycle/commit/organizations' \
+    QUERYCOMMITREADY=$(curl --location --request GET "$IPADDR:8080/fabric/lifecycle/commit/organizations" \
     --header 'Content-Type: application/json' \
     --data-raw '{
     "cc_name": "basic",
@@ -74,7 +75,7 @@ queryCommitReady(){
 
 queryCommitted(){
      sleep $DELAY
-    QUERYCOMMIT=$(curl --location --request GET '127.0.0.1:8080/fabric/lifecycle/commit' \
+    QUERYCOMMIT=$(curl --location --request GET "$IPADDR:8080/fabric/lifecycle/commit" \
     --header 'Content-Type: application/json' \
     --data-raw '{
     "cc_name": "basic",
