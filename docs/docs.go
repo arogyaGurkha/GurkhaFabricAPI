@@ -471,6 +471,23 @@ var doc = `{
                 }
             }
         },
+        "/fabric/repository/logs": {
+            "get": {
+                "description": "` + "`" + `git reflog` + "`" + ` is executed through ` + "`" + `exec.Command()` + "`" + ` to show the reflogs.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "repository"
+                ],
+                "summary": "Show the reflog.",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
         "/fabric/repository/pull": {
             "post": {
                 "description": "Pull changes from a remote repository.",
@@ -484,6 +501,57 @@ var doc = `{
                     "repository"
                 ],
                 "summary": "Pull changes from a remote repository.",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/fabric/repository/reset": {
+            "post": {
+                "description": "` + "`" + `git fetch` + "`" + `, ` + "`" + `git reset --hard` + "`" + `, ` + "`" + `git clean -xdf` + "`" + ` is executed through ` + "`" + `exec.Command()` + "`" + ` to reset local repository.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "repository"
+                ],
+                "summary": "Reset local repository.",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/fabric/repository/revert": {
+            "post": {
+                "description": "Revert most recent update.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "repository"
+                ],
+                "summary": "Revert most recent update.",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/fabric/repository/updates": {
+            "get": {
+                "description": "` + "`" + `git log HEAD..origin/main --oneline` + "`" + ` is executed through ` + "`" + `exec.Command()` + "`" + ` to print incoming changes.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "repository"
+                ],
+                "summary": "Show incoming changes.",
                 "responses": {
                     "200": {
                         "description": "successful operation"

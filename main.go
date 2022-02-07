@@ -42,6 +42,10 @@ func main() {
 	// repository routes
 	router.POST("fabric/repository/clone", repo.CloneCC)
 	router.POST("fabric/repository/pull", repo.PullOrigin)
+	router.POST("fabric/repository/revert", repo.RevertUpdate)
+	router.POST("fabric/repository/reset", repo.ResetLocal)
+	router.GET("fabric/repository/updates", repo.CheckUpdate)
+	router.GET("fabric/repository/logs", repo.GetRefLogs)
 
 	// chaincode routes
 	router.POST("fabric/chaincode/invoke", cc.InvokeCC)

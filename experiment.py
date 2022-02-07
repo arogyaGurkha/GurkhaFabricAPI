@@ -6,7 +6,7 @@ from requests import request
 from os import path
 import sys
 
-script_dir = path.dirname(__file__)
+script_dir = path.dirname(path.abspath(__file__))
 cmd = "deployCC -ccn basic -ccp ../GurkhaContracts/asset-transfer-basic/chaincode-go/ -ccl go"
 
 
@@ -47,7 +47,7 @@ def deployCC():
 
 
 def curl_test(repeats):
-    with open(script_dir + '/automation_cURL_r' + str(repeats) + '.csv', 'w', newline='')as file:
+    with open('automation_cURL_r' + str(repeats) + '.csv', 'w', newline='')as file:
         writer = wt(file)
         writer.writerow(["Run", "automated cURL"])
         for i in range(repeats):
@@ -57,7 +57,7 @@ def curl_test(repeats):
 
 
 def deployCC_test(repeats):
-    with open(script_dir + '/deployCC_r' + str(repeats) + '.csv', 'w', newline='')as file:
+    with open('deployCC_r' + str(repeats) + '.csv', 'w', newline='')as file:
         writer = wt(file)
         writer.writerow(["Run", "deployCC"])
         for i in range(repeats):
