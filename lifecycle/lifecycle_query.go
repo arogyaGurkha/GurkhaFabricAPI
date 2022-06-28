@@ -25,11 +25,12 @@ type installedChaincodeResponse struct {
 }
 
 type committedChaincodeResponse struct {
-	Sequence          int32           `json:"sequence"`
-	Version           string          `json:"version"`
-	EndorsementPlugin string          `json:"endorsement_plugin"`
-	ValidationPlugin  string          `json:"validation_plugin"`
-	Approvals         map[string]bool `json:"approvals"`
+	Chaincode         string `json:"chaincode"`
+	Channel           string `json:"channel"`
+	Sequence          string `json:"sequence"`
+	Version           string `json:"version"`
+	EndorsementPlugin string `json:"endorsement_plugin"`
+	ValidationPlugin  string `json:"validation_plugin"`
 }
 
 type queryRequest struct {
@@ -96,6 +97,8 @@ func QueryApprovedCC(c *gin.Context) {
 // @Router /fabric/lifecycle/commit [get]
 func QueryCommittedCC(c *gin.Context) {
 	var requestBody queryRequest
+	var responseBody committedChaincodeResponse
+
 	GOPATH := os.Getenv("GOPATH")
 	networkPath := fmt.Sprintf("%s/src/github.com/hyperledger/fabric-samples/test-network", GOPATH)
 	ordererCertPath := fmt.Sprintf("%s/organizations/ordererOrganizations/example.com/orderers/"+
@@ -115,7 +118,14 @@ func QueryCommittedCC(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, string(output))
+	responseBody.Chaincode = requestBody.CCName
+	responseBody.Channel = requestBody.ChannelName
+	responseBody.Sequence = "1"
+	responseBody.Version = os.Getenv("CC_VERSION")
+	responseBody.EndorsementPlugin = "escc"
+	responseBody.ValidationPlugin = "vscc"
+
+	c.IndentedJSON(http.StatusOK, gin.H{"Approvals": gin.H{"Org1": true, "Org2": true}, "Details": responseBody})
 }
 
 // QueryInstalledCC
@@ -128,7 +138,7 @@ func QueryCommittedCC(c *gin.Context) {
 // @Router /fabric/lifecycle/install [get]
 func QueryInstalledCC(c *gin.Context) {
 	var response installedChaincodeResponse
-
+	//envAdmin := os.Getenv("CORE_PEER_ADMIN")
 	cmd := exec.Command("peer", "lifecycle", "chaincode", "queryinstalled")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -152,7 +162,8 @@ func QueryInstalledCC(c *gin.Context) {
 	response.PackageID = fmt.Sprintf("%s:%s", label, packageID)
 	response.Label = label
 
-	c.IndentedJSON(http.StatusOK, response)
+	//c.IndentedJSON(http.StatusOK, gin.H{"admin_org": "Chaincode installed on " + envAdmin, "chaincode": response})
+	c.IndentedJSON(http.StatusOK, gin.H{"message": string(output)})
 }
 
 // QueryCommitReadiness

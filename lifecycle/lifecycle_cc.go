@@ -225,6 +225,11 @@ func CommitCC(c *gin.Context) {
 		return
 	}
 
+	os.Setenv("CC_NAME", requestBody.ChannelName)
+	os.Setenv("CC_SEQUENCE", string(requestBody.CCSequence))
+	os.Setenv("CC_VERSION", requestBody.CCVersion)
+	os.Setenv("CHANNEL_NAME", requestBody.ChannelName)
+
 	cmd := exec.Command("peer", "lifecycle", "chaincode", "commit", "-o", orderer.IP,
 		"--ordererTLSHostnameOverride", orderer.Name, "--channelID", requestBody.ChannelName, "--name", requestBody.CCName,
 		"--version", requestBody.CCVersion, "--sequence", fmt.Sprint(requestBody.CCSequence), "--tls",

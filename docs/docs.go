@@ -88,6 +88,22 @@ var doc = `{
                 }
             }
         },
+        "/fabric/dashboard/deployCC": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "repository-dashboard"
+                ],
+                "summary": "Install specified CC using deployCC script.",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
         "/fabric/lifecycle/admin": {
             "get": {
                 "description": "Use terminal environmental variables to get the admin for peer cli container. Only Org1 and Org2 are supported.",
@@ -441,7 +457,7 @@ var doc = `{
             }
         },
         "/fabric/repository/clone": {
-            "post": {
+            "get": {
                 "description": "Clone a repository.",
                 "consumes": [
                     "application/json"
@@ -489,7 +505,7 @@ var doc = `{
             }
         },
         "/fabric/repository/pull": {
-            "post": {
+            "get": {
                 "description": "Pull changes from a remote repository.",
                 "consumes": [
                     "application/json"
@@ -666,17 +682,17 @@ var doc = `{
         "lifecycle.committedChaincodeResponse": {
             "type": "object",
             "properties": {
-                "approvals": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "boolean"
-                    }
+                "chaincode": {
+                    "type": "string"
+                },
+                "channel": {
+                    "type": "string"
                 },
                 "endorsement_plugin": {
                     "type": "string"
                 },
                 "sequence": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "validation_plugin": {
                     "type": "string"

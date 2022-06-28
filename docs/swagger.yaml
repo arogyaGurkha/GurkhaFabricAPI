@@ -67,14 +67,14 @@ definitions:
     type: object
   lifecycle.committedChaincodeResponse:
     properties:
-      approvals:
-        additionalProperties:
-          type: boolean
-        type: object
+      chaincode:
+        type: string
+      channel:
+        type: string
       endorsement_plugin:
         type: string
       sequence:
-        type: integer
+        type: string
       validation_plugin:
         type: string
       version:
@@ -175,6 +175,16 @@ paths:
       summary: Query using the specified chaincode.
       tags:
       - chaincode
+  /fabric/dashboard/deployCC:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+      summary: Install specified CC using deployCC script.
+      tags:
+      - repository-dashboard
   /fabric/lifecycle/admin:
     get:
       consumes:
@@ -424,7 +434,7 @@ paths:
       tags:
       - peer
   /fabric/repository/clone:
-    post:
+    get:
       consumes:
       - application/json
       description: Clone a repository.
@@ -457,7 +467,7 @@ paths:
       tags:
       - repository
   /fabric/repository/pull:
-    post:
+    get:
       consumes:
       - application/json
       description: Pull changes from a remote repository.

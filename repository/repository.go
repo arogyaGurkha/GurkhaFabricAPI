@@ -27,7 +27,7 @@ func AddRemote(c *gin.Context) {
 // @Produce json
 // @Tags repository
 // @Success 200 "successful operation"
-// @Router /fabric/repository/clone [post]
+// @Router /fabric/repository/clone [get]
 func CloneCC(c *gin.Context) {
 	var requestBody cloneRequest
 	GOPATH := os.Getenv("GOPATH")
@@ -160,7 +160,7 @@ func CheckUpdate(c *gin.Context) {
 // @Produce json
 // @Tags repository
 // @Success 200 "successful operation"
-// @Router /fabric/repository/pull [post]
+// @Router /fabric/repository/pull [get]
 func PullOrigin(c *gin.Context) {
 	// git pull origin
 	GOPATH := os.Getenv("GOPATH")
