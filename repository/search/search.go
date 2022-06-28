@@ -153,7 +153,7 @@ func ESSearchWithLanguage(c *gin.Context) {
 	)
 
 	if err != nil {
-		log.Fatalf("Error: %s", err)
+		log.Printf("Error: %s", err)
 	}
 	defer res.Body.Close()
 
