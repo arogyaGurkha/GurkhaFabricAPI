@@ -18,6 +18,28 @@ type installCC struct {
 	CCLanguage string `json:"cc_language"`
 }
 
+type transactionRequest struct {
+	AssetID  string `json:"asset_id"`
+	NewOwner string `json:"new_owner"`
+}
+
+type transactionResponse struct {
+	Peer string `json:"peer"`
+}
+
+type assetQueryResponse struct {
+	Assets []*asset `json:""`
+}
+
+type asset struct {
+	Value int    `json:"value"`
+	Color int    `json:"color"`
+	ID    string `json:"id"`
+	Owner string `json:"owner"`
+	Model string `json:"model"`
+	EV    bool   `json:"ev"`
+}
+
 // InstallWithDeployCC
 // @Summary Install specified CC using deployCC script.
 // @Produce json
@@ -66,6 +88,41 @@ func AddDataToES(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
 	}
 	c.IndentedJSON(http.StatusOK, gin.H{"message": res})
+}
+
+func QueryAssets(c *gin.Context) {
+	GOPATH := os.Getenv("GOPATH")
+	networkPath := fmt.Sprintf("%s/src/github.com/hyperledger/fabric-samples/test-network/scripts", GOPATH)
+
+	cmd := exec.Command("bash", "queryAsset.sh")
+	cmd.Dir = networkPath
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		errMessage := fmt.Sprintf(fmt.Sprint(err) + ": " + string(output))
+		c.IndentedJSON(http.StatusForbidden, gin.H{"message": errMessage})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, string(output))
+}
+
+func CreateTransaction(c *gin.Context) {
+	var transactionRequest transactionRequest
+	if err := c.BindJSON(&transactionRequest); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err})
+		return
+	}
+	//
+	//cmd := exec.Command("peer", "version")
+	//output, err := cmd.CombinedOutput()
+	//if err != nil {
+	//	errMessage := fmt.Sprintf(fmt.Sprint(err) + ": " + string(output))
+	//	c.IndentedJSON(http.StatusForbidden, gin.H{"message": errMessage})
+	//	return
+	//}
+
+	c.IndentedJSON(http.StatusOK, transactionRequest)
 }
 
 func createRandomSHA() string {

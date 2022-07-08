@@ -23,6 +23,11 @@ import (
 // @contact.url https://github.com/arogyaGurkha
 func main() {
 	updateSwagger()
+	router := setupRouter()
+	router.Run(":8080")
+}
+
+func setupRouter() *gin.Engine {
 
 	router := gin.Default()
 
@@ -71,14 +76,15 @@ func main() {
 	// repository/dashboard routes
 	router.POST("fabric/dashboard/deployCC", dashboard.InstallWithDeployCC)
 	router.POST("fabric/dashboard/smart-contracts", dashboard.AddDataToES)
+	router.POST("fabric/dashboard/smart-contracts/transaction", dashboard.CreateTransaction)
+	router.GET("fabric/dashboard/smart-contracts/asset", dashboard.QueryAssets)
 
 	// Swagger
 	docs.SwaggerInfo.BasePath = "/"
 	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json") // Points to the API definition
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
-	router.Run(":8080")
-
+	return router
 }
 
 func updateSwagger() {
