@@ -77,12 +77,20 @@ func init() {
 func esClientConfig() elasticsearch.Config {
 	cfg := elasticsearch.Config{
 		Addresses:              []string{"https://localhost:9200"},
-		APIKey:                 "YTQxNTA0RUJnaTRWekEyY2pqOGs6bVF2UFZPSUVSSm1IU0FJcTlxdmNDZw==",
-		CertificateFingerprint: "02dfe14e1ae96a59695b5821893380e6dae3e264ca0b27bd176c7b6866f6a5c7",
+		APIKey:                 "M2pFb0dvSUJMcUZSRUdCblZBeTM6OTE0SkdicDBUcFNXNUNaR0thWUVtZw==",
+		CertificateFingerprint: "d5846a165165b0316be92a4a5916e0b2c697c778e32bd034f0ce8094925de712",
 	}
 	return cfg
 }
 
+// ESSearchAll
+// @Summary Search documents stored in the search index.
+// @Description Searches documents using the keyword provided by the react client. Uses '*' wildcard if no keyword provided.
+// @Param q query string true "search keyword"
+// @Produce json
+// @Tags search
+// @Success 200 {object} Article
+// @Router /fabric/dashboard/smart-contracts [get]
 func ESSearchAll(c *gin.Context) {
 
 	searchString := c.Query("filter")

@@ -124,6 +124,54 @@ definitions:
       url:
         type: string
     type: object
+  search.Article:
+    properties:
+      app_languages:
+        items:
+          additionalProperties:
+            type: string
+          type: object
+        type: array
+      author:
+        type: string
+      cc_languages:
+        items:
+          $ref: '#/definitions/search.CCLanguage'
+        type: array
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      platform:
+        type: string
+      signature_policy:
+        type: string
+      uploaded:
+        type: string
+      versions:
+        items:
+          additionalProperties:
+            type: string
+          type: object
+        type: array
+    type: object
+  search.CCLanguage:
+    properties:
+      asset_struct:
+        additionalProperties:
+          type: string
+        type: object
+      dependencies:
+        additionalProperties:
+          type: string
+        type: object
+      language:
+        type: string
+      link:
+        type: string
+    type: object
 info:
   contact:
     name: arogya.Gurkha
@@ -184,7 +232,42 @@ paths:
           description: successful operation
       summary: Install specified CC using deployCC script.
       tags:
-      - repository-dashboard
+      - dashboard
+  /fabric/dashboard/smart-contracts:
+    get:
+      description: Searches documents using the keyword provided by the react client.
+        Uses '*' wildcard if no keyword provided.
+      parameters:
+      - description: search keyword
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/search.Article'
+      summary: Search documents stored in the search index.
+      tags:
+      - search
+    post:
+      consumes:
+      - application/json
+      description: Receive data from UI to upload to the search index. Auto inserts
+        random ID and upload date values.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/search.Article'
+      summary: Add document to search index.
+      tags:
+      - dashboard
   /fabric/lifecycle/admin:
     get:
       consumes:
