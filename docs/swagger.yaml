@@ -258,6 +258,13 @@ paths:
       - application/json
       description: Receive data from UI to upload to the search index. Auto inserts
         random ID and upload date values.
+      parameters:
+      - description: Document that needs to be uploaded to the search index.
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/search.Article'
       produces:
       - application/json
       responses:

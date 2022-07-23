@@ -144,6 +144,17 @@ var doc = `{
                     "dashboard"
                 ],
                 "summary": "Add document to search index.",
+                "parameters": [
+                    {
+                        "description": "Document that needs to be uploaded to the search index.",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/search.Article"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

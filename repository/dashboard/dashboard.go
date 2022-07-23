@@ -77,6 +77,7 @@ func InstallWithDeployCC(c *gin.Context) {
 // @Summary Add document to search index.
 // @Description Receive data from UI to upload to the search index. Auto inserts random ID and upload date values.
 // @Accept json
+// @Param body body search.Article true "Document that needs to be uploaded to the search index."
 // @Produce json
 // @Tags dashboard
 // @Success 200 {object} search.Article
