@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/arogyaGurkha/GurkhaFabricAPI/admin"
 	cc "github.com/arogyaGurkha/GurkhaFabricAPI/chaincode"
 	"github.com/arogyaGurkha/GurkhaFabricAPI/docs"
 	lc "github.com/arogyaGurkha/GurkhaFabricAPI/lifecycle"
@@ -13,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"log"
 	"os/exec"
 )
 
@@ -22,13 +24,16 @@ import (
 // @contact.name arogya.Gurkha
 // @contact.url https://github.com/arogyaGurkha
 func main() {
+	log.Println("==========Application Start==========")
+
+	admin.SetConnection()
+
 	updateSwagger()
 	router := setupRouter()
 	router.Run(":8080")
 }
 
 func setupRouter() *gin.Engine {
-
 	router := gin.Default()
 
 	// CORS
@@ -36,6 +41,11 @@ func setupRouter() *gin.Engine {
 		AllowAllOrigins: true,
 		AllowHeaders:    []string{"content-type"},
 	}))
+	//jeho admin
+	adminRouter := router.Group("/fabric/admin")
+	{
+		adminRouter.GET("/addorg", admin.AddOrg)
+	}
 
 	// peer routes
 	router.GET("/fabric/peer/", peer.GetPeerVersion)
@@ -76,7 +86,8 @@ func setupRouter() *gin.Engine {
 	// repository/dashboard routes
 	router.POST("fabric/dashboard/deployCC", dashboard.InstallWithDeployCC)
 	router.POST("fabric/dashboard/smart-contracts", dashboard.AddDataToES)
-	router.POST("fabric/dashboard/smart-contracts/transaction", dashboard.CreateTransaction)
+	//router.POST("fabric/dashboard/smart-contracts/transaction", dashboard.CreateTransaction)
+	router.POST("fabric/dashboard/smart-contracts/transaction", dashboard.AssetTransfer2)
 	router.GET("fabric/dashboard/smart-contracts/asset", dashboard.QueryAssets)
 
 	// Swagger

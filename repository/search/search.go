@@ -77,9 +77,10 @@ func init() {
 func esClientConfig() elasticsearch.Config {
 	cfg := elasticsearch.Config{
 		Addresses:              []string{"https://localhost:9200"},
-		APIKey:                 "YTQxNTA0RUJnaTRWekEyY2pqOGs6bVF2UFZPSUVSSm1IU0FJcTlxdmNDZw==",
-		CertificateFingerprint: "02dfe14e1ae96a59695b5821893380e6dae3e264ca0b27bd176c7b6866f6a5c7",
+		APIKey:                 "LXdSNlBZSUIzeGJWM1hPWnJFTGI6LXI3Q0ZXN1dRUEdhOTZvOUs1TEFaUQ==",
+		CertificateFingerprint: "cd64546586a17b49a908137399a1f9739d9fbfdae1c66074ea0881314ff4052b",
 	}
+	//password : XEGwyYour=Xi*wdhYIRl
 	return cfg
 }
 
