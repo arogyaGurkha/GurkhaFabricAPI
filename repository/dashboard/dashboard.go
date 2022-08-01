@@ -53,7 +53,7 @@ var (
 // InstallWithDeployCC
 // @Summary Install specified CC using deployCC script.
 // @Produce json
-// @Tags repository-dashboard
+// @Tags dashboard
 // @Success 200 "successful operation"
 // @Router /fabric/dashboard/deployCC [post]
 func InstallWithDeployCC(c *gin.Context) {
@@ -80,6 +80,15 @@ func InstallWithDeployCC(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "CC Installed"})
 }
 
+// AddDataToES
+// @Summary Add document to search index.
+// @Description Receive data from UI to upload to the search index. Auto inserts random ID and upload date values.
+// @Accept json
+// @Param body body search.Article true "Document that needs to be uploaded to the search index."
+// @Produce json
+// @Tags dashboard
+// @Success 200 {object} search.Article
+// @Router /fabric/dashboard/smart-contracts [post]
 func AddDataToES(c *gin.Context) {
 	var searchArticle search.Article
 	if err := c.BindJSON(&searchArticle); err != nil {

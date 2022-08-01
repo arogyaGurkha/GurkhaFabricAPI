@@ -78,12 +78,73 @@
                     "application/json"
                 ],
                 "tags": [
-                    "repository-dashboard"
+                    "dashboard"
                 ],
                 "summary": "Install specified CC using deployCC script.",
                 "responses": {
                     "200": {
                         "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/fabric/dashboard/smart-contracts": {
+            "get": {
+                "description": "Searches documents using the keyword provided by the react client. Uses '*' wildcard if no keyword provided.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "Search documents stored in the search index.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "search keyword",
+                        "name": "q",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/search.Article"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Receive data from UI to upload to the search index. Auto inserts random ID and upload date values.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dashboard"
+                ],
+                "summary": "Add document to search index.",
+                "parameters": [
+                    {
+                        "description": "Document that needs to be uploaded to the search index.",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/search.Article"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/search.Article"
+                        }
                     }
                 }
             }
@@ -751,6 +812,79 @@
                     "type": "string"
                 },
                 "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "search.Article": {
+            "type": "object",
+            "properties": {
+                "app_languages": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "author": {
+                    "type": "string"
+                },
+                "cc_languages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/search.CCLanguage"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "platform": {
+                    "type": "string"
+                },
+                "signature_policy": {
+                    "type": "string"
+                },
+                "uploaded": {
+                    "type": "string"
+                },
+                "versions": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "search.CCLanguage": {
+            "type": "object",
+            "properties": {
+                "asset_struct": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "dependencies": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "language": {
+                    "type": "string"
+                },
+                "link": {
                     "type": "string"
                 }
             }
