@@ -57,7 +57,7 @@ var (
 // @Success 200 "successful operation"
 // @Router /fabric/dashboard/deployCC [post]
 func InstallWithDeployCC(c *gin.Context) {
-	ccPathRoot := "../GurkhaContracts"
+	ccPathRoot := "~/Download"
 
 	var requestBody installCC
 	if err := c.BindJSON(&requestBody); err != nil {
@@ -66,7 +66,7 @@ func InstallWithDeployCC(c *gin.Context) {
 	}
 
 	finalCCPath := fmt.Sprintf("%s/%s", ccPathRoot, requestBody.CCPath)
-
+	log.Println(fmt.Sprintf("CCName :%s, ccPath :%s, finalCCPath : %s", requestBody.CCName, requestBody.CCPath, finalCCPath))
 	cmd := exec.Command("bash", "network.sh", "deployCC", "-ccn", requestBody.CCName, "-ccp", finalCCPath, "-ccl", requestBody.CCLanguage)
 	cmd.Dir = networkPath
 
@@ -91,17 +91,17 @@ func InstallWithDeployCC(c *gin.Context) {
 // @Router /fabric/dashboard/smart-contracts [post]
 func AddDataToES(c *gin.Context) {
 	var searchArticle search.Article
-	if err := c.BindJSON(&searchArticle); err != nil {
+	if err := c.ShouldBindJSON(&searchArticle); err != nil {
+		log.Println(err)
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
 
-	searchArticle.ID = createRandomSHA()
 	searchArticle.UploadDate = fmt.Sprintf(time.Now().UTC().Format("2006-01-02"))
-
 	res, err := search.AddDocumentToES(&searchArticle)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
+		return
 	}
 	c.IndentedJSON(http.StatusOK, gin.H{"message": res})
 }

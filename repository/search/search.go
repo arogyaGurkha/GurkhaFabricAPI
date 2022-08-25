@@ -5,12 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 	"github.com/elastic/go-elasticsearch/v8/esutil"
 	"github.com/gin-gonic/gin"
-	"log"
-	"net/http"
 )
 
 type elasticClient struct {
@@ -77,8 +78,8 @@ func init() {
 func esClientConfig() elasticsearch.Config {
 	cfg := elasticsearch.Config{
 		Addresses:              []string{"https://localhost:9200"},
-		APIKey:                 "LXdSNlBZSUIzeGJWM1hPWnJFTGI6LXI3Q0ZXN1dRUEdhOTZvOUs1TEFaUQ==",
-		CertificateFingerprint: "cd64546586a17b49a908137399a1f9739d9fbfdae1c66074ea0881314ff4052b",
+		APIKey:                 "NGxGcTA0SUJJNV9WaFdaendvd2I6VzJkTDBDTF9SeldCM2ZsU2Q4TGdjUQ==",
+		CertificateFingerprint: "f8ad46c3cfb5547f2963f6dc7866a8108680af9d2ef2a833fa77c58437ac73a9",
 	}
 	//password : XEGwyYour=Xi*wdhYIRl
 	return cfg
@@ -204,25 +205,36 @@ func EsDocumentByID(c *gin.Context) {
 func AddDocumentToES(item *Article) (string, error) {
 	payload, err := json.Marshal(item)
 	if err != nil {
+		log.Println(err)
 		return "", err
 	}
-
+	log.Print("payload : ")
+	log.Println(payload)
 	ctx := context.Background()
-	res, err := esapi.CreateRequest{
+	req := esapi.IndexRequest{
 		Index:      esClient.IndexName,
-		DocumentID: item.ID,
+		DocumentID: string(item.ID),
 		Body:       bytes.NewReader(payload),
-	}.Do(ctx, esClient.es)
+		Refresh:    "true",
+	}
+	res, err := req.Do(ctx, esClient.es)
 	if err != nil {
-		return "", err
+		log.Fatalf("Error getting rsponse: %s", err)
 	}
 	defer res.Body.Close()
+
+	log.Println(res.StatusCode)
+	log.Println(res.Body)
 
 	if res.IsError() {
 		var e map[string]interface{}
 		if err := json.NewDecoder(res.Body).Decode(&e); err != nil {
+			log.Print("payload : ")
+			log.Println(e)
+			log.Println(err)
 			return "", err
 		}
+		log.Print(e)
 		return "", fmt.Errorf("[%s] %s: %s", res.Status(),
 			e["error"].(map[string]interface{})["type"],
 			e["error"].(map[string]interface{})["reason"])

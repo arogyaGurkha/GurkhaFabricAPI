@@ -26,7 +26,7 @@ const (
 	peerEndpoint  = "localhost:7051"
 	gatewayPeer   = "peer0.org1.example.com"
 	channelName   = "mychannel"
-	chaincodeName = "basic"
+	chaincodeName = "estate"
 )
 
 var (
