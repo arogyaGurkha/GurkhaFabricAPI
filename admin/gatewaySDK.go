@@ -41,6 +41,17 @@ var (
 	networkPath  = fmt.Sprintf("%s/src/github.com/hyperledger/fabric-samples/test-network", GOPATH)
 )
 
+type TransactionRequest struct {
+	Function string `json:"function"`
+	// Method       string `json:"method"`
+	AssetID      string `json:"asset_id"`
+	NewOwner     string `json:"new_owner"`
+	NewAddress   string `json:"new_address"`
+	NewSize      string `json:"new_size"`
+	NewSaleValue string `json:"new_salevalue"`
+	NewRentvalue string `json:"new_rentvalue"`
+}
+
 func SetConnection() {
 	log.Println("===============Set Connection ===============")
 	clientConnection := newGrpcConnection()
@@ -67,6 +78,12 @@ func SetConnection() {
 	InitLedger(ContractPass)
 }
 
+/*
+InitLedger(contract *client.Contract)
+getAllAssets(contract *client.Contract)
+createAsset(contract *client.Contract)
+
+*/
 func InitLedger(contract *client.Contract) {
 	fmt.Printf("Submit Transaction: InitLedger, function creates the initial set of assets on the ledger \n")
 
@@ -90,10 +107,11 @@ func getAllAssets(contract *client.Contract) {
 
 	fmt.Printf("*** Result:%s\n", result)
 }
-func createAsset(contract *client.Contract) {
+func CreateAsset(contract *client.Contract, transactionRequest TransactionRequest) {
 	fmt.Printf("Submit Transaction: CreateAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments \n")
 
-	_, err := contract.SubmitTransaction("CreateAsset", assetId, "yellow", "5", "Tom", "1300")
+	_, err := contract.SubmitTransaction("CreateAsset",
+		transactionRequest.AssetID, transactionRequest.NewAddress, transactionRequest.NewOwner, transactionRequest.NewSize, transactionRequest.NewSaleValue, transactionRequest.NewRentvalue)
 	if err != nil {
 		panic(fmt.Errorf("failed to submit transaction: %w", err))
 	}
@@ -135,26 +153,27 @@ func transferAssetAsync(contract *client.Contract) {
 
 	fmt.Printf("*** Transaction committed successfully\n")
 }
-func UpdateAsset(contract *client.Contract, id string, color string, size int, owner string, appraisedValue int) {
-	submitResult, commit, err := contract.SubmitAsync("UpdateAsset", client.WithArguments(id, color, fmt.Sprintf("%d", size), owner, fmt.Sprintf("%d", appraisedValue)))
+func UpdateAsset(contract *client.Contract, transactionRequest TransactionRequest) {
+	submitResult, commit, err := contract.SubmitAsync("UpdateAsset", client.WithArguments(
+		transactionRequest.AssetID, transactionRequest.NewAddress, transactionRequest.NewOwner, transactionRequest.NewSize, transactionRequest.NewSaleValue, transactionRequest.NewRentvalue))
 	if err != nil {
 		panic(fmt.Errorf("failed to submit transaction asynchronously: %w", err))
 	}
-	fmt.Printf("Successfully submitted transaction to update Asset from %s to %s. \n", string(submitResult), owner)
+	fmt.Printf("Successfully submitted transaction to update Asset %s", string(submitResult))
 	if status, err := commit.Status(); err != nil {
 		panic(fmt.Errorf("failed to get commit status: %w", err))
 	} else if !status.Successful {
 		panic(fmt.Errorf("transaction %s failed to commit with status: %d", status.TransactionID, int32(status.Code)))
 	}
 }
-func TransferAsset(contract *client.Contract, id string, newOwner string) string {
-	log.Println(contract, "2", id, newOwner)
+func TransferAsset(contract *client.Contract, transactionRequest TransactionRequest) string {
+	log.Println(contract, "2", transactionRequest.AssetID, transactionRequest.NewOwner)
 
-	submitResult, commit, err := contract.SubmitAsync("TransferAsset", client.WithArguments(id, newOwner))
+	submitResult, commit, err := contract.SubmitAsync("TransferAsset", client.WithArguments(transactionRequest.AssetID, transactionRequest.NewOwner))
 	if err != nil {
 		panic(fmt.Errorf("failed to submit transaction asynchronously: %w", err))
 	}
-	fmt.Printf("Successfully submitted transaction to transfer ownership from %s to %s. \n", string(submitResult), newOwner)
+	fmt.Printf("Successfully submitted transaction to transfer ownership from %s to %s. \n", string(submitResult), transactionRequest.NewOwner)
 
 	if status, err := commit.Status(); err != nil {
 		panic(fmt.Errorf("failed to get commit status: %w", err))

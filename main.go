@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"os/exec"
+
 	"github.com/arogyaGurkha/GurkhaFabricAPI/admin"
 	cc "github.com/arogyaGurkha/GurkhaFabricAPI/chaincode"
 	"github.com/arogyaGurkha/GurkhaFabricAPI/docs"
@@ -14,8 +17,6 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"log"
-	"os/exec"
 )
 
 // @title Hyperledger Fabric Gurkhaman API
@@ -84,11 +85,13 @@ func setupRouter() *gin.Engine {
 	router.GET("fabric/dashboard/search", search.ESSearchWithLanguage)
 
 	// repository/dashboard routes
+
 	router.POST("fabric/dashboard/deployCC", dashboard.InstallWithDeployCC)
 	router.POST("fabric/dashboard/smart-contracts", dashboard.AddDataToES)
 	//router.POST("fabric/dashboard/smart-contracts/transaction", dashboard.CreateTransaction)
-	router.POST("fabric/dashboard/smart-contracts/transaction", dashboard.AssetTransfer2)
+	router.POST("fabric/dashboard/smart-contracts/transaction", dashboard.AssetTransfer)
 	router.GET("fabric/dashboard/smart-contracts/asset", dashboard.QueryAssets)
+	router.POST("fabric/dashboard/smart-contracts/file", dashboard.FileUpload)
 
 	// Swagger
 	docs.SwaggerInfo.BasePath = "/"

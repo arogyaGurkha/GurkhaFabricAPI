@@ -78,8 +78,8 @@ func init() {
 func esClientConfig() elasticsearch.Config {
 	cfg := elasticsearch.Config{
 		Addresses:              []string{"https://localhost:9200"},
-		APIKey:                 "NGxGcTA0SUJJNV9WaFdaendvd2I6VzJkTDBDTF9SeldCM2ZsU2Q4TGdjUQ==",
-		CertificateFingerprint: "f8ad46c3cfb5547f2963f6dc7866a8108680af9d2ef2a833fa77c58437ac73a9",
+		APIKey:                 "ajVuZzE0SUJlczZ5ZEtIV2FEaDI6Wjh0ZXZySmNSaG1HbTBkakpGcC1pdw==",
+		CertificateFingerprint: "39342712d2129a0a4bb9c835452777108e30588860ae260f6b11a7e53aae7659",
 	}
 	//password : XEGwyYour=Xi*wdhYIRl
 	return cfg
@@ -208,8 +208,6 @@ func AddDocumentToES(item *Article) (string, error) {
 		log.Println(err)
 		return "", err
 	}
-	log.Print("payload : ")
-	log.Println(payload)
 	ctx := context.Background()
 	req := esapi.IndexRequest{
 		Index:      esClient.IndexName,
@@ -222,9 +220,6 @@ func AddDocumentToES(item *Article) (string, error) {
 		log.Fatalf("Error getting rsponse: %s", err)
 	}
 	defer res.Body.Close()
-
-	log.Println(res.StatusCode)
-	log.Println(res.Body)
 
 	if res.IsError() {
 		var e map[string]interface{}
