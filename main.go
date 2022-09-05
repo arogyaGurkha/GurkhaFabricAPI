@@ -85,7 +85,8 @@ func setupRouter() *gin.Engine {
 	router.GET("fabric/dashboard/search", search.ESSearchWithLanguage)
 
 	// repository/dashboard routes
-
+	router.GET("fabric/dashboard/download/:name", dashboard.QueryAssets)
+	router.GET("fabric/dashboard/downloadCC", dashboard.DownloadCC)
 	router.POST("fabric/dashboard/deployCC", dashboard.InstallWithDeployCC)
 	router.POST("fabric/dashboard/smart-contracts", dashboard.AddDataToES)
 	//router.POST("fabric/dashboard/smart-contracts/transaction", dashboard.CreateTransaction)

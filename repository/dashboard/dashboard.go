@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/arogyaGurkha/GurkhaFabricAPI/admin"
@@ -46,6 +48,7 @@ var (
 	scriptPath      = fmt.Sprintf("%s/src/github.com/hyperledger/fabric-samples/test-network/scripts", GOPATH)
 	now             = time.Now()
 	assetId         = fmt.Sprintf("asset%d", now.Unix()*1e3+int64(now.Nanosecond()/1e6))
+	CCPATHROOT      = "/home/jeho/Downloads/chaincodes"
 )
 
 // FileUpload
@@ -60,7 +63,7 @@ func FileUpload(c *gin.Context) {
 	var inputData search.Article
 	json.Unmarshal([]byte(rawData), &inputData)
 	file, _ := c.FormFile("file")
-	c.SaveUploadedFile(file, fmt.Sprintf(`/home/jeho/Downloads/chaincodes/%s.tar.gz`, inputData.Name))
+	c.SaveUploadedFile(file, fmt.Sprintf(`%s/%s.tar.gz`, CCPATHROOT, inputData.Name))
 	log.Println("zip file uploaded successfully")
 
 	// save smart constarct info
@@ -81,7 +84,6 @@ func FileUpload(c *gin.Context) {
 // @Success 200 "successful operation"
 // @Router /fabric/dashboard/deployCC [post]
 func InstallWithDeployCC(c *gin.Context) {
-	ccPathRoot := "/home/jeho/Downloads/chaincodes"
 
 	var requestBody installCC
 	if err := c.BindJSON(&requestBody); err != nil {
@@ -90,7 +92,8 @@ func InstallWithDeployCC(c *gin.Context) {
 	}
 
 	setEnv()
-	finalCCPath := fmt.Sprintf("%s/%s", ccPathRoot, requestBody.CCPath)
+	finalCCPath := fmt.Sprintf("%s/%s", CCPATHROOT, requestBody.CCPath)
+	log.Println("Deploying chaincode...")
 	log.Println(fmt.Sprintf("CCName :%s, ccPath :%s, finalCCPath : %s", requestBody.CCName, requestBody.CCPath, finalCCPath))
 	cmd := exec.Command("bash", "./scripts/deployTarCC.sh", "mychannel", requestBody.CCName, requestBody.CCLanguage)
 	cmd.Dir = networkPath
@@ -104,6 +107,32 @@ func InstallWithDeployCC(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "CC Installed"})
+}
+
+// DownloadCC
+// @Summary Download specified CC
+// @Produce json
+// @Tags dashboard
+// @Success 200 "successful operation"
+// @Router /fabric/dashboard/downloadCC [GET]
+func DownloadCC(c *gin.Context) {
+	fileName := c.Query("name")
+	log.Println(fileName)
+	targetPath := filepath.Join(CCPATHROOT, fmt.Sprintf("%s.tar.gz", fileName))
+	log.Println(targetPath)
+	//This ckeck is for example, I not sure is it can prevent all possible filename attacks - will be much better if real filename will not come from user side. I not even tryed this code
+	if !strings.HasPrefix(filepath.Clean(targetPath), CCPATHROOT) {
+		c.String(403, "Look like you attacking me")
+		return
+	}
+	//Seems this headers needed for some browsers (for example without this headers Chrome will download files as txt)
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Content-Disposition", "attachment; filename="+fileName)
+	c.Header("Content-Type", "application/octet-stream")
+	c.File(targetPath)
+
+	// c.IndentedJSON(http.StatusOK, gin.H{"message": "CC Download successfully"})
 }
 
 // AddDataToES
